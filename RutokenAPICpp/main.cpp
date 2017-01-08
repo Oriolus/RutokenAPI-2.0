@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
     cout << "KeyID size: " << keyID << endl;
     cout << "KeyID: " << keyID << endl;
 
+    /* DIGEST TESTING */
     try
     {
         string plaintext = "Plaintext for hash";
@@ -149,37 +150,58 @@ int main(int argc, char *argv[])
         delete te;
     }
 
+    /* ENCRYPT/DECRYPT TESTING */
     cout << endl;
     try
     {
+        cout << "GOST 28147-89 CBC TESTING" << endl;
         string plaintext = "Plaintext for enc/dec";
         string iv = "initvect";
-        cout << "Plaintext size: " << plaintext.size() << endl;
-        cout << "Plaintext: " << plaintext << endl;
+        cout << "\tPlaintext size: " << plaintext.size() << endl;
+        cout << "\tPlaintext: " << plaintext << endl;
         cout << "\tIV size: " << iv.size() << endl;
         cout << "\tIV: " << iv << endl;
+        cout << endl;
 
         string ciphertext = crypto->Encrypt_Gost28147(keyID, plaintext, &iv);
         cout << "\tCiphertext size: " << ciphertext.size() << endl;
         cout << "\tCiphertext" << ciphertext << endl;
-
         cout << endl;
+
         string _plaintext = crypto->Decrypt_Gost28147(keyID, ciphertext, &iv);
         cout << "\tDeciphered size: " << _plaintext.size() << endl;
         cout << "\tDeciphered: " << _plaintext << endl;
 
         if(plaintext == _plaintext) cout << "\tPlaintexts are equals" << endl;
         else cout << "\tPlaintexts aren't equals" << endl;
+        cout << endl;
+
+        /* GOST 28147-89 ECB TESTING */
+        cout << "GOST 28147-89 ECB TESTING" << endl;
+        string sTextEcb = crypto->Encrypt_Gost28147_ECB(keyID, plaintext);
+        cout << "\tCiphertext size: " << sTextEcb.size() << endl;
+        cout << sTextEcb << endl;
+
+        string dTextEcb = crypto->Decrypt_Gost28147_ECB(keyID, sTextEcb);
+        cout << "\tDeciphered size: " << dTextEcb.size() << endl;
+        cout << "\tDiciphered: " << dTextEcb << endl;
+
+        if(dTextEcb.substr(0, plaintext.size()) == plaintext) cout << "\tPlaintexts are equals" << endl;
+        else cout << "\tPlaintexts aren't equals" << endl;
+        cout << endl;
 
     }
     catch(TException *te)
     {
         cout << te->GetReason() << " " << (int64_t)te->GetCode() << endl;
+        cout << endl;
         delete te;
     }
 
+    /* MAC TESTING */
     try
     {
+        cout << "GOST 28147-89 MAC TESTING" << endl;
         string plaintext = "Plaintext for MAC";
         string iv = "initvect";
         cout << "Plaintext size: " << plaintext.size() << endl;

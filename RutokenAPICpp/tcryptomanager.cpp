@@ -113,6 +113,20 @@ string TCryptoManager::Encrypt_Gost28147(const string &keyID, const string &plai
     return sEncrypt(keyID, plaintext, IV, CKM_GOST28147, CKO_SECRET_KEY);
 }
 
+string TCryptoManager::Encrypt_Gost28147_ECB(const string &keyID, const string &plaintext)
+{
+    string tmpPlaintext = plaintext;
+    while(tmpPlaintext.size() % 8 != 0)
+        tmpPlaintext += (char)0;
+    return sEncrypt(keyID, tmpPlaintext, nullptr, CKM_GOST28147_ECB, CKO_SECRET_KEY);
+}
+
+string TCryptoManager::Decrypt_Gost28147_ECB(const string &keyID, const string &ciphertext)
+{
+    return sDecrypt(keyID, ciphertext, nullptr, CKM_GOST28147_ECB, CKO_SECRET_KEY);
+}
+
+
 CK_BYTE_PTR TCryptoManager::encrypt(const CK_OBJECT_HANDLE hKey,
                                     CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize,
                                     CK_BYTE_PTR bpIV, const CK_ULONG lIVSize,

@@ -34,6 +34,10 @@ public:
 
     string                  Encrypt_Gost28147(const string &keyID, const string &plaintext, const string *IV);
     string                  Decrypt_Gost28147(const string &keyID, const string &ciphertext, const std::string *IV);
+
+    string                  Encrypt_Gost28147_ECB(const string &keyID, const string &plaintext);
+    string                  Decrypt_Gost28147_ECB(const string &keyID, const string &ciphertext);
+
     string                  MAC_Gost28147_SIGN(const string &keyID, const string &plaintext, const string &IV);
     bool                    MAC_Gost28147_VERIFY(const string &keyID, const string &plaintext, const string &IV, const string &signature);
 
