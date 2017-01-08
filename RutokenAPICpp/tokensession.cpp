@@ -49,7 +49,7 @@ void TokenSession::OpenSessionOnSlot(const int64_t slot)
     openSessionOnSlot(slot);
 }
 
-std::string TokenSession::getSerial()
+byte_array TokenSession::getSerial()
 {
     preCheck();
     if(this->aSlot == -1)
@@ -66,8 +66,8 @@ std::string TokenSession::getSerial()
         throw new TException("Can't get token info", Error::FUNCTION_FAILED);
     }
 
-    std::string result((const char*)tokenInfo.serialNumber, (const char*)tokenInfo.serialNumber + sizeof(tokenInfo.serialNumber));
-    result = PkcsConvert::Trim(result);
+    byte_array result((byte*)tokenInfo.serialNumber, (byte*)tokenInfo.serialNumber + sizeof(tokenInfo.serialNumber));
+    result = PkcsConvert::TrimBA(result);
     return result;
 }
 
@@ -137,7 +137,7 @@ void TokenSession::Reconnect(const int64_t user, std::string &pin)
     login(user, pin);
 }
 
-std::string TokenSession::GetTokenSerial()
+byte_array TokenSession::GetTokenSerial()
 {
     return getSerial();
 }

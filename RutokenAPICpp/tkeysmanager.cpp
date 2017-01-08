@@ -20,7 +20,7 @@ void TKeyManager::preCheck()
     }
 }
 
-string TKeyManager::createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType)
+byte_array TKeyManager::createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType)
 {
     preCheck();
 
@@ -35,10 +35,10 @@ string TKeyManager::createKey(map<Attribute, string> &attributes, const CK_OBJEC
         throw new TException("Can't create object", (Error)rv);
     }
 
-    return attributes[Attribute::ID];
+    return byte_array(attributes[Attribute::ID].begin(), attributes[Attribute::ID].end());
 }
 
-map<Attribute, string> TKeyManager::getKeyAttributes(const string &keyID, const CK_OBJECT_CLASS keyClass)
+map<Attribute, string> TKeyManager::getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
     if(!(keyClass != CKO_PRIVATE_KEY || keyClass != CKO_PUBLIC_KEY || keyClass != CKO_SECRET_KEY))
@@ -182,12 +182,12 @@ map<Attribute, string> TKeyManager::getKeyAttributes(const string &keyID, const 
    return result;
 }
 
-vector<CK_OBJECT_HANDLE> TKeyManager::getKeyHandle(const string &keyID, const CK_OBJECT_CLASS keyClass)
+vector<CK_OBJECT_HANDLE> TKeyManager::getKeyHandle(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
 
     CK_RV rv = CKR_OK;
-    int64_t ulKeyIdLen = keyID.length();
+    int64_t ulKeyIdLen = keyID.size();
     CK_OBJECT_CLASS ocKey = keyClass;
     CK_ATTRIBUTE searchForIdAttr[] =
     {
@@ -302,7 +302,7 @@ CK_ATTRIBUTE_PTR TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClas
 
     int64_t lIdSize = attributeIDSize;
     CK_BYTE_PTR bpID = nullptr;
-    string _keyID;
+    byte_array _keyID;
     if(attributes[Attribute::ID] == "")
     {
         bool done = false;
@@ -310,7 +310,8 @@ CK_ATTRIBUTE_PTR TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClas
         {
             bpID = generateId(&lIdSize);
             _keyID = session->GetTokenSerial();
-            _keyID += string((const char*)bpID, lIdSize);
+            byte_array ba_tmp((byte*)bpID, (byte*)bpID + lIdSize);
+            _keyID.insert(_keyID.end(), ba_tmp.begin(), ba_tmp.end());
             if(getKeyHandle(_keyID, objectClass).size() == 0)
             {
                 done = true;
@@ -318,14 +319,14 @@ CK_ATTRIBUTE_PTR TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClas
             delete[] bpID;
             bpID = nullptr;
         }while(!done);
-        bpID = PkcsConvert::Str2CK_BYTE(_keyID, &lIdSize);
+        bpID = PkcsConvert::ByteArray2CK_BYTE(_keyID, &lIdSize);
     }
     else
     {
         if(attributes[Attribute::ID].size() < 10)
         {
             _keyID = session->GetTokenSerial();
-            _keyID += attributes[Attribute::ID].substr(0, 2);
+            _keyID.insert(_keyID.begin(), attributes[Attribute::ID].begin(), attributes[Attribute::ID].begin() + 2);
             if(getKeyHandle(_keyID, objectClass).size() > 0)
             {
                 delete object_class;
@@ -335,9 +336,9 @@ CK_ATTRIBUTE_PTR TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClas
         }
         else
         {
-            _keyID = attributes[Attribute::ID];
+            _keyID = byte_array(attributes[Attribute::ID].begin(), attributes[Attribute::ID].end());
         }
-        bpID = PkcsConvert::Str2CK_BYTE(_keyID, &lIdSize);
+        bpID = PkcsConvert::ByteArray2CK_BYTE(_keyID, &lIdSize);
     }
 
     int64_t lLabelSize = 0;
@@ -453,20 +454,19 @@ CK_BYTE_PTR TKeyManager::generateId(int64_t *size)
     return result;
 }
 
-string TKeyManager::GenerateKeyGOST28147(map<Attribute, string> &attributes)
+byte_array TKeyManager::GenerateKeyGOST28147(map<Attribute, string> &attributes)
 {
     preCheck();
 
     CK_MECHANISM gost28147_mech = { CKM_GOST28147_KEY_GEN, NULL_PTR, 0 };
     CK_OBJECT_HANDLE secretKeyHandle = NULL_PTR;
 
-    string returnedID;
     int64_t lAttributesSize = 0;
     CK_ATTRIBUTE_PTR attrGost28147_Secret = getAttributeArray(CKO_SECRET_KEY, CKK_GOST28147, attributes, &lAttributesSize);
     CK_RV rv = pFunctionList->C_GenerateKey(hSession, &gost28147_mech, attrGost28147_Secret, lAttributesSize, &secretKeyHandle);
     CK_BYTE_PTR bpID = (CK_BYTE_PTR)attrGost28147_Secret[idPosition].pValue;
     CK_ULONG ulIDSize = attrGost28147_Secret[idPosition].ulValueLen;
-    returnedID = string((const char*)bpID, ulIDSize);
+    byte_array returnedID((byte*)bpID, (byte*)bpID + ulIDSize);
     overwriteAndFreeAttributesWithValue(attrGost28147_Secret);
 
     if(rv != CKR_OK)
@@ -482,12 +482,12 @@ vector<map<Attribute, string>> TKeyManager::GetSecretKeyList()
     return getKeyList(CKO_SECRET_KEY);
 }
 
-bool TKeyManager::IsSecretKeyExists(const string &keyID)
+bool TKeyManager::IsSecretKeyExists(const byte_array &keyID)
 {
     return getKeyHandle(keyID, CKO_SECRET_KEY).size() > 0;
 }
 
-void TKeyManager::RemoveSecretKey(const string &keyID)
+void TKeyManager::RemoveSecretKey(const byte_array &keyID)
 {
     removeKey(keyID, CKO_SECRET_KEY);
 }
@@ -569,8 +569,8 @@ vector<map<Attribute, string>> TKeyManager::getKeyList(const CK_OBJECT_CLASS obj
         rv = pFunctionList->C_GetAttributeValue(hSession, i, gettingValueAttr, arraysize(gettingValueAttr));
         if(rv != CKR_OK)
         {
-            delete[] gettingValueAttr[0].pValue;
-            delete[] gettingValueAttr[1].pValue;
+            delete[] (CK_BYTE_PTR)gettingValueAttr[0].pValue;
+            delete[] (CK_BYTE_PTR)gettingValueAttr[1].pValue;
             continue;
         }
         string label = string((const char*)gettingValueAttr[0].pValue, gettingValueAttr[0].ulValueLen);
@@ -579,15 +579,15 @@ vector<map<Attribute, string>> TKeyManager::getKeyList(const CK_OBJECT_CLASS obj
         mTmp.insert(std::pair<Attribute, string>(Attribute::LABEL, label));
         mTmp.insert(std::pair<Attribute, string>(Attribute::ID, id));
         result.push_back(mTmp);
-        delete[] gettingValueAttr[0].pValue;
-        delete[] gettingValueAttr[1].pValue;
+        delete[] (CK_BYTE_PTR)gettingValueAttr[0].pValue;
+        delete[] (CK_BYTE_PTR)gettingValueAttr[1].pValue;
         mTmp.clear();
     }
 
     return result;
 }
 
-void TKeyManager::removeKey(const string &keyID, const CK_OBJECT_CLASS objectClass)
+void TKeyManager::removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass)
 {
     preCheck();
     vector<CK_OBJECT_HANDLE> handles = getKeyHandle(keyID, objectClass);

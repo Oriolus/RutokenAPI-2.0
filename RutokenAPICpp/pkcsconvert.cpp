@@ -47,3 +47,28 @@ string PkcsConvert::Trim(std::string &str)
     size_t last = str.find_last_not_of(' ');
     return str.substr(first, (last - first + 1));
 }
+
+void PkcsConvert::OverwriteByteArray(byte_array *ba)
+{
+    unsigned char *ba_data = (unsigned char*)ba->data();
+    for(size_t i = 0; i < ba->size(); i++)
+        ba_data[i] = 0x00;
+}
+
+CK_BYTE_PTR PkcsConvert::ByteArray2CK_BYTE(const byte_array &ba, int64_t *outsize)
+{
+    *outsize = 0;
+    CK_BYTE_PTR result = new CK_BYTE[ba.size()];
+    for(size_t i = 0; i < ba.size(); i++)
+        result[i] = ba[i];
+    *outsize = ba.size();
+    return result;
+}
+
+byte_array PkcsConvert::TrimBA(byte_array &ba)
+{
+    int space_q = 0;
+    for(; ba[ba.size() - 1 - space_q] == ' '; space_q++);
+    if(space_q == 0) return ba;
+    return byte_array(ba.begin(), ba.end() - space_q);
+}

@@ -12,6 +12,17 @@
 #ifndef Common_H
 #define Common_H
 
+#include <vector>
+#ifndef __BYTE
+#define __BYTE
+typedef unsigned char byte;
+#endif
+
+#ifndef __BYTE_ARRAY__
+#define __BYTE_ARRAY__
+typedef std::vector<byte> byte_array;
+#endif
+
 #ifdef _WIN32
 	#include <stdio.h>
 	#include <Windows.h>

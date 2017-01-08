@@ -25,13 +25,13 @@ class TKeyManager
 public:
     TKeyManager(TokenSession *tSession);
 
-    string                                      GenerateKeyGOST28147(map<Attribute, string> &attributes);
+    byte_array                                  GenerateKeyGOST28147(map<Attribute, string> &attributes);
     vector<map<Attribute, string>>              GetSecretKeyList();
-    map<Attribute, string>                      GetSecretKeyAttributes(const string &keyID) { return getKeyAttributes(keyID, CKO_SECRET_KEY); }
-    string                                      CreateSecretKey(map<Attribute, string> &attributes) { return createKey(attributes, CKO_SECRET_KEY, CKK_GOST28147); }
+    map<Attribute, string>                      GetSecretKeyAttributes(const byte_array &keyID) { return getKeyAttributes(keyID, CKO_SECRET_KEY); }
+    byte_array                                  CreateSecretKey(map<Attribute, string> &attributes) { return createKey(attributes, CKO_SECRET_KEY, CKK_GOST28147); }
 
-    bool                                        IsSecretKeyExists(const string &keyID);
-    void                                        RemoveSecretKey(const string &keyID);
+    bool                                        IsSecretKeyExists(const byte_array &keyID);
+    void                                        RemoveSecretKey(const byte_array &keyID);
     void                                        RemoveAllKeys();
     void                                        SetSessionHandle(const uint64_t hSession) { this->hSession = (CK_SESSION_HANDLE)hSession; }
 
@@ -39,17 +39,18 @@ public:
 
 private:
     void                                        preCheck();
-    string                                      createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType);
-    map<Attribute, string>                      getKeyAttributes(const string &keyID, const CK_OBJECT_CLASS keyClass);
-    vector<CK_OBJECT_HANDLE>                    getKeyHandle(const string &keyID, const CK_OBJECT_CLASS keyClass);
+    byte_array                                  createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType);
+    map<Attribute, string>                      getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass);
+    vector<CK_OBJECT_HANDLE>                    getKeyHandle(const byte_array &keyID, const CK_OBJECT_CLASS keyClass);
     void                                        overwriteAndFreeAttributes(CK_ATTRIBUTE_PTR attributes);
     void                                        overwriteAndFreeAttributesWithValue(CK_ATTRIBUTE_PTR attributes);
     CK_ATTRIBUTE_PTR                            getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, map<Attribute, string> attributes, int64_t *size);
     CK_BYTE_PTR                                 generateId(int64_t *size);
 
+
     vector<CK_OBJECT_HANDLE>                    findKeys(const CK_OBJECT_CLASS objectClass);
     vector<map<Attribute, string>>              getKeyList(const CK_OBJECT_CLASS objectClass);
-    void                                        removeKey(const string &keyID, const CK_OBJECT_CLASS objectClass);
+    void                                        removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass);
 
     TokenSession                                *session;
     CK_SESSION_HANDLE                           hSession;
