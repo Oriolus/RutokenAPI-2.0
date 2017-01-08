@@ -113,12 +113,11 @@ string TCryptoManager::Encrypt_Gost28147(const string &keyID, const string &plai
     return sEncrypt(keyID, plaintext, IV, CKM_GOST28147, CKO_SECRET_KEY);
 }
 
-string TCryptoManager::Encrypt_Gost28147_ECB(const string &keyID, const string &plaintext)
+string TCryptoManager::Encrypt_Gost28147_ECB(const string &keyID, std::string &plaintext)
 {
-    string tmpPlaintext = plaintext;
-    while(tmpPlaintext.size() % 8 != 0)
-        tmpPlaintext += (char)0;
-    return sEncrypt(keyID, tmpPlaintext, nullptr, CKM_GOST28147_ECB, CKO_SECRET_KEY);
+    while(plaintext.size() % 8 != 0)
+        plaintext += (char)0;
+    return sEncrypt(keyID, plaintext, nullptr, CKM_GOST28147_ECB, CKO_SECRET_KEY);
 }
 
 string TCryptoManager::Decrypt_Gost28147_ECB(const string &keyID, const string &ciphertext)
@@ -233,7 +232,7 @@ string TCryptoManager::sDecrypt(const string &keyID, const string &ciphertext, c
     return result;
 }
 
-string TCryptoManager::MAC_Gost28147_SIGN(const string &keyID, const string &plaintext, const string &IV)
+string TCryptoManager::MAC_Gost28147_SIGN(const string &keyID, const std::string &plaintext, const string &IV)
 {
     return sMac(keyID, plaintext, &IV, 4, CKM_GOST28147_MAC, CKO_SECRET_KEY);
 }

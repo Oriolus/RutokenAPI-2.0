@@ -178,11 +178,13 @@ int main(int argc, char *argv[])
 
         /* GOST 28147-89 ECB TESTING */
         cout << "GOST 28147-89 ECB TESTING" << endl;
-        string sTextEcb = crypto->Encrypt_Gost28147_ECB(keyID, plaintext);
-        cout << "\tCiphertext size: " << sTextEcb.size() << endl;
-        cout << sTextEcb << endl;
+        string plaintextEcb(plaintext);
+        string cTextEcb = crypto->Encrypt_Gost28147_ECB(keyID, plaintextEcb);
+        cout << "\tChanged plaintext: " << plaintextEcb << endl;
+        cout << "\tCiphertext size: " << cTextEcb.size() << endl;
+        cout << cTextEcb << endl;
 
-        string dTextEcb = crypto->Decrypt_Gost28147_ECB(keyID, sTextEcb);
+        string dTextEcb = crypto->Decrypt_Gost28147_ECB(keyID, cTextEcb);
         cout << "\tDeciphered size: " << dTextEcb.size() << endl;
         cout << "\tDiciphered: " << dTextEcb << endl;
 
