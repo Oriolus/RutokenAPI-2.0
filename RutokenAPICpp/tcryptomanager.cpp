@@ -167,7 +167,7 @@ CK_BYTE_PTR pkcs11_core::crypto::TCryptoManager::encrypt(const CK_OBJECT_HANDLE 
 byte_array pkcs11_core::crypto::TCryptoManager::sEncrypt(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const CK_MECHANISM_TYPE encMechType, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
-    vector<CK_OBJECT_HANDLE> keysHandles = this->keyManager->getKeyHandle(keyID, keyClass);
+    std::vector<CK_OBJECT_HANDLE> keysHandles = this->keyManager->getKeyHandle(keyID, keyClass);
     if(keysHandles.size() == 0)
         throw new TException("Can't find keys with such id", Error::KEY_HANDLE_HOT_FOUND);
 
@@ -223,7 +223,7 @@ byte_array pkcs11_core::crypto::TCryptoManager::sDecrypt(const byte_array &keyID
 {
     preCheck();
 
-    vector<CK_OBJECT_HANDLE> keysHaldles = keyManager->getKeyHandle(keyID, keyClass);
+    std::vector<CK_OBJECT_HANDLE> keysHaldles = keyManager->getKeyHandle(keyID, keyClass);
     if(keysHaldles.size() == 0)
         throw new TException("Can't find key with such id", Error::KEY_HANDLE_HOT_FOUND);
 
@@ -277,7 +277,7 @@ byte_array pkcs11_core::crypto::TCryptoManager::sMac(const byte_array &keyID, co
 {
     preCheck();
 
-    vector<CK_OBJECT_HANDLE> keysHandles = keyManager->getKeyHandle(keyID, keyClass);
+    std::vector<CK_OBJECT_HANDLE> keysHandles = keyManager->getKeyHandle(keyID, keyClass);
     if(keysHandles.size() == 0)
         throw new TException("Can't find key with such id", Error::KEY_HANDLE_HOT_FOUND);
 
@@ -312,7 +312,7 @@ bool pkcs11_core::crypto::TCryptoManager::isSignatureCorrect(const byte_array &k
 {
     preCheck();
 
-    vector<CK_OBJECT_HANDLE> keysHandles = keyManager->getKeyHandle(keyID, keyClass);
+    std::vector<CK_OBJECT_HANDLE> keysHandles = keyManager->getKeyHandle(keyID, keyClass);
     if(keysHandles.size() == 0)
         throw new TException("Can't find key with such id", Error::KEY_HANDLE_HOT_FOUND);
 

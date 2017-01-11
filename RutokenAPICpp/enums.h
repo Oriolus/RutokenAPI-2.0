@@ -4,24 +4,8 @@
 #include "include_rt/rtpkcs11.h"
 #include <cstdint>
 
-enum class PackageType : int8_t
+namespace pkcs11_core
 {
-    ClientHello =                       1,
-    ClientHelloAck =                    2,
-    AlgorithmSync =                     3,
-    AlgorithmSyncAck =                  4,
-    Data =                              5,
-    Disconnect =                        6
-};
-
-enum class DisconnectReason : int8_t
-{
-    OK =                                0,
-    WrongPackageFormat =                1,
-    MAC_Incorrect =                     2,
-    HandshakeFailed =                   3,
-    TimeOut =                           4
-};
 
 enum class Key : uint64_t
 {
@@ -75,23 +59,6 @@ enum class Attribute : uint64_t
     GOST28147_PARAMS =                  CKA_GOST28147_PARAMS
 };
 
-enum class MemoryAttribute : int64_t
-{
-    VOLUME_SIZE,
-    ACCESS_MODE,
-    OWNER,
-    FLAGS,
-    ID
-};
-
-enum class AccessMode : int64_t
-{
-    CD =                                ACCESS_MODE_CD,
-    HIDDEN =                            ACCESS_MODE_HIDDEN,
-    READ_ONLY =                         ACCESS_MODE_RO,
-    READ_WRITE =                        ACCESS_MODE_RW
-};
-
 enum class KeyGenerateMechanism : int64_t
 {
     GOSTR3410_256 =                     CKM_GOSTR3410_KEY_PAIR_GEN,
@@ -101,13 +68,6 @@ enum class KeyGenerateMechanism : int64_t
 
     GOSTR3410_256_DERIVE =              CKM_GOSTR3410_DERIVE,
     GOSTR3410_512_DERIVE =              CKM_GOSTR3410_12_DERIVE
-};
-
-enum class Algorithm : int64_t
-{
-    NoAlgorithm =                       -1,
-    GOST28147_OFB =                     CKM_GOST28147,
-    GOST28147_MAC =                     CKM_GOST28147_MAC
 };
 
 enum class SymmetricMechanism : int64_t
@@ -250,6 +210,8 @@ enum class Error : uint64_t
     LIBRARI_NOT_LOADED =                0x10000005,
     FUNCTION_LIST_NOT_INITIALIZED =     0x10000006
 };
+
+}
 
 #endif // ENUMS_H
 

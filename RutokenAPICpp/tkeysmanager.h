@@ -15,9 +15,6 @@
 
 namespace pkcs11_core
 {
-using std::string;
-using std::map;
-using std::vector;
 
 namespace crypto
 {
@@ -30,31 +27,31 @@ class TKeyManager
 public:
     TKeyManager(device::TokenSession *tSession);
 
-    byte_array                                  GenerateKeyGOST28147(map<Attribute, string> &attributes);
-    vector<map<Attribute, string>>              GetSecretKeyList();
-    map<Attribute, string>                      GetSecretKeyAttributes(const byte_array &keyID) { return getKeyAttributes(keyID, CKO_SECRET_KEY); }
-    byte_array                                  CreateSecretKey(map<Attribute, string> &attributes) { return createKey(attributes, CKO_SECRET_KEY, CKK_GOST28147); }
+    byte_array                                  GenerateKeyGOST28147(std::map<Attribute, std::string> &attributes);
+    std::vector<std::map<Attribute, std::string>> GetSecretKeyList();
+    std::map<Attribute, std::string>            GetSecretKeyAttributes(const byte_array &keyID) { return getKeyAttributes(keyID, CKO_SECRET_KEY); }
+    byte_array                                  CreateSecretKey(std::map<Attribute, std::string> &attributes) { return createKey(attributes, CKO_SECRET_KEY, CKK_GOST28147); }
 
     bool                                        IsSecretKeyExists(const byte_array &keyID);
     void                                        RemoveSecretKey(const byte_array &keyID);
     void                                        RemoveAllKeys();
     void                                        SetSessionHandle(const uint64_t hSession) { this->hSession = (CK_SESSION_HANDLE)hSession; }
 
-    static void                                 FreeAttributesTemplate(map<Attribute, string> *attributeTmpl);
+    static void                                 FreeAttributesTemplate(std::map<Attribute, std::string> *attributeTmpl);
 
 private:
     void                                        preCheck();
-    byte_array                                  createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType);
-    map<Attribute, string>                      getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass);
-    vector<CK_OBJECT_HANDLE>                    getKeyHandle(const byte_array &keyID, const CK_OBJECT_CLASS keyClass);
+    byte_array                                  createKey(std::map<Attribute, std::string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType);
+    std::map<Attribute, std::string>            getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass);
+    std::vector<CK_OBJECT_HANDLE>               getKeyHandle(const byte_array &keyID, const CK_OBJECT_CLASS keyClass);
     void                                        overwriteAndFreeAttributes(CK_ATTRIBUTE_PTR attributes);
     void                                        overwriteAndFreeAttributesWithValue(CK_ATTRIBUTE_PTR attributes);
-    CK_ATTRIBUTE_PTR                            getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, map<Attribute, string> attributes, int64_t *size);
+    CK_ATTRIBUTE_PTR                            getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, std::map<Attribute, std::string> attributes, int64_t *size);
     CK_BYTE_PTR                                 generateId(int64_t *size);
 
 
-    vector<CK_OBJECT_HANDLE>                    findKeys(const CK_OBJECT_CLASS objectClass);
-    vector<map<Attribute, string>>              getKeyList(const CK_OBJECT_CLASS objectClass);
+    std::vector<CK_OBJECT_HANDLE>               findKeys(const CK_OBJECT_CLASS objectClass);
+    std::vector<std::map<Attribute, std::string>> getKeyList(const CK_OBJECT_CLASS objectClass);
     void                                        removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass);
 
     device::TokenSession                        *session;

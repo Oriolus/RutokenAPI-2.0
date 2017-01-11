@@ -20,7 +20,7 @@ void pkcs11_core::crypto::TKeyManager::preCheck()
     }
 }
 
-byte_array pkcs11_core::crypto::TKeyManager::createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType)
+byte_array pkcs11_core::crypto::TKeyManager::createKey(std::map<Attribute, std::string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType)
 {
     preCheck();
 
@@ -38,7 +38,7 @@ byte_array pkcs11_core::crypto::TKeyManager::createKey(map<Attribute, string> &a
     return byte_array(attributes[Attribute::ID].begin(), attributes[Attribute::ID].end());
 }
 
-std::map<Attribute, std::string> pkcs11_core::crypto::TKeyManager::getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
+std::map<pkcs11_core::Attribute, std::string> pkcs11_core::crypto::TKeyManager::getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
     if(!(keyClass != CKO_PRIVATE_KEY || keyClass != CKO_PUBLIC_KEY || keyClass != CKO_SECRET_KEY))
@@ -46,7 +46,7 @@ std::map<Attribute, std::string> pkcs11_core::crypto::TKeyManager::getKeyAttribu
         throw new TException("Unknown key class", Error::UNKNOWN_KEY_CLASS);
     }
 
-   vector<CK_OBJECT_HANDLE> keyHandels = getKeyHandle(keyID, keyClass);
+   std::vector<CK_OBJECT_HANDLE> keyHandels = getKeyHandle(keyID, keyClass);
    if(keyHandels.size() == 0)
    {
        throw new TException("Key handle not found", Error::KEY_HANDLE_HOT_FOUND);
@@ -126,46 +126,46 @@ std::map<Attribute, std::string> pkcs11_core::crypto::TKeyManager::getKeyAttribu
         throw new TException("Can't get attributes values", (Error)rv);
     }
 
-    map<Attribute, string> result;
+    std::map<Attribute, std::string> result;
 
-    result.insert(std::pair<Attribute, string>(Attribute::ID, string((const char*)apAttributesTmpl[idPosition].pValue, apAttributesTmpl[idPosition].ulValueLen)));
-    result.insert(std::pair<Attribute, string>(Attribute::LABEL, string((const char*)apAttributesTmpl[labelPosition].pValue, apAttributesTmpl[labelPosition].ulValueLen)));
-    result.insert(std::pair<Attribute, string>(Attribute::VALUE, string((const char*)apAttributesTmpl[valuePosition].pValue, apAttributesTmpl[valuePosition].ulValueLen)));
+    result.insert(std::pair<Attribute, std::string>(Attribute::ID, std::string((const char*)apAttributesTmpl[idPosition].pValue, apAttributesTmpl[idPosition].ulValueLen)));
+    result.insert(std::pair<Attribute, std::string>(Attribute::LABEL, std::string((const char*)apAttributesTmpl[labelPosition].pValue, apAttributesTmpl[labelPosition].ulValueLen)));
+    result.insert(std::pair<Attribute, std::string>(Attribute::VALUE, std::string((const char*)apAttributesTmpl[valuePosition].pValue, apAttributesTmpl[valuePosition].ulValueLen)));
     size_t lResult = 6;
     if(keyClass == CKO_SECRET_KEY)
     {
-        result.insert(std::pair<Attribute, string>(Attribute::GOST28147_PARAMS, string((const char*)apAttributesTmpl[gost28147ParamsPosition].pValue, apAttributesTmpl[gost28147ParamsPosition].ulValueLen)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::GOST28147_PARAMS, std::string((const char*)apAttributesTmpl[gost28147ParamsPosition].pValue, apAttributesTmpl[gost28147ParamsPosition].ulValueLen)));
     }
     else
     {
-        result.insert(std::pair<Attribute, string>(Attribute::GOST3410_PARAMS, string((const char*)apAttributesTmpl[gost3410ParamsPosition].pValue, apAttributesTmpl[gost3410ParamsPosition].ulValueLen)));
-        result.insert(std::pair<Attribute, string>(Attribute::GOST3411_PARAMS, string((const char*)apAttributesTmpl[gost3411ParamsPosition].pValue, apAttributesTmpl[gost3411ParamsPosition].ulValueLen)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::GOST3410_PARAMS, std::string((const char*)apAttributesTmpl[gost3410ParamsPosition].pValue, apAttributesTmpl[gost3410ParamsPosition].ulValueLen)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::GOST3411_PARAMS, std::string((const char*)apAttributesTmpl[gost3411ParamsPosition].pValue, apAttributesTmpl[gost3411ParamsPosition].ulValueLen)));
         lResult = 7;
     }
 
-    result.insert(std::pair<Attribute, string>(Attribute::TOKEN_, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-    result.insert(std::pair<Attribute, string>(Attribute::PRIVATE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-    result.insert(std::pair<Attribute, string>(Attribute::MODIFIABLE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+    result.insert(std::pair<Attribute, std::string>(Attribute::TOKEN_, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+    result.insert(std::pair<Attribute, std::string>(Attribute::PRIVATE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+    result.insert(std::pair<Attribute, std::string>(Attribute::MODIFIABLE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
 
     switch(keyClass)
     {
     case CKO_PRIVATE_KEY:
-        result.insert(std::pair<Attribute, string>(Attribute::DECRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::SIGN, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::SENSITIVE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::EXTRACTABLE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::DECRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::SIGN, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::SENSITIVE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::EXTRACTABLE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
         break;
     case CKO_PUBLIC_KEY:
-        result.insert(std::pair<Attribute, string>(Attribute::ENCRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::VERIFY, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::ENCRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::VERIFY, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
         break;
     case CKO_SECRET_KEY:
-        result.insert(std::pair<Attribute, string>(Attribute::DECRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::ENCRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::SIGN, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::VERIFY, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::SENSITIVE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
-        result.insert(std::pair<Attribute, string>(Attribute::EXTRACTABLE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::DECRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::ENCRYPT, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::SIGN, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::VERIFY, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::SENSITIVE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
+        result.insert(std::pair<Attribute, std::string>(Attribute::EXTRACTABLE, PkcsConvert::Bool2Str(*(bool*)apAttributesTmpl[lResult++].pValue)));
         break;
     }
 
@@ -212,7 +212,7 @@ std::vector<CK_OBJECT_HANDLE> pkcs11_core::crypto::TKeyManager::getKeyHandle(con
         throw TException("Finding object error", (Error)rv);
     }
 
-    vector<CK_OBJECT_HANDLE> result(lHandleCount);
+    std::vector<CK_OBJECT_HANDLE> result(lHandleCount);
     for(size_t i = 0; i < lHandleCount; i++)
         result[i] = pHandles[i];
     delete[] pHandles;
@@ -272,7 +272,7 @@ void pkcs11_core::crypto::TKeyManager::overwriteAndFreeAttributesWithValue(CK_AT
 
 }
 
-CK_ATTRIBUTE_PTR pkcs11_core::crypto::TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, map<Attribute, string> attributes, int64_t *size)
+CK_ATTRIBUTE_PTR pkcs11_core::crypto::TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, std::map<Attribute, std::string> attributes, int64_t *size)
 {
     preCheck();
     if(!(objectClass != CKO_PRIVATE_KEY || objectClass != CKO_SECRET_KEY || objectClass != CKO_PUBLIC_KEY))
@@ -454,7 +454,7 @@ CK_BYTE_PTR pkcs11_core::crypto::TKeyManager::generateId(int64_t *size)
     return result;
 }
 
-byte_array pkcs11_core::crypto::TKeyManager::GenerateKeyGOST28147(map<Attribute, string> &attributes)
+byte_array pkcs11_core::crypto::TKeyManager::GenerateKeyGOST28147(std::map<Attribute, std::string> &attributes)
 {
     preCheck();
 
@@ -477,7 +477,7 @@ byte_array pkcs11_core::crypto::TKeyManager::GenerateKeyGOST28147(map<Attribute,
     return returnedID;
 }
 
-std::vector<std::map<Attribute, std::string>> pkcs11_core::crypto::TKeyManager::GetSecretKeyList()
+std::vector<std::map<pkcs11_core::Attribute, std::string>> pkcs11_core::crypto::TKeyManager::GetSecretKeyList()
 {
     return getKeyList(CKO_SECRET_KEY);
 }
@@ -496,8 +496,8 @@ void pkcs11_core::crypto::TKeyManager::RemoveAllKeys()
 {
     preCheck();
 
-    vector<CK_OBJECT_HANDLE> handles = findKeys(CKO_PRIVATE_KEY);
-    vector<CK_OBJECT_HANDLE> tmp = findKeys(CKO_PUBLIC_KEY);
+    std::vector<CK_OBJECT_HANDLE> handles = findKeys(CKO_PRIVATE_KEY);
+    std::vector<CK_OBJECT_HANDLE> tmp = findKeys(CKO_PUBLIC_KEY);
     handles.insert(handles.end(), tmp.begin(), tmp.end());
     tmp = findKeys(CKO_SECRET_KEY);
     handles.insert(handles.end(), tmp.begin(), tmp.end());
@@ -508,7 +508,7 @@ void pkcs11_core::crypto::TKeyManager::RemoveAllKeys()
     }
 }
 
-void pkcs11_core::crypto::TKeyManager::FreeAttributesTemplate(std::map<Attribute, string> *attributeTmpl)
+void pkcs11_core::crypto::TKeyManager::FreeAttributesTemplate(std::map<pkcs11_core::Attribute, std::string> *attributeTmpl)
 {
 }
 
@@ -517,7 +517,7 @@ std::vector<CK_OBJECT_HANDLE> pkcs11_core::crypto::TKeyManager::findKeys(const C
     preCheck();
 
     CK_RV rv = CKR_OK;
-    vector<CK_OBJECT_HANDLE> result;
+    std::vector<CK_OBJECT_HANDLE> result;
     CK_OBJECT_CLASS ocKey = objectClass;
     CK_ATTRIBUTE keySearchForClassAttr[] = { CKA_CLASS, &ocKey, sizeof(ocKey) };
     rv = pFunctionList->C_FindObjectsInit(hSession, keySearchForClassAttr, arraysize(keySearchForClassAttr));
@@ -546,13 +546,13 @@ std::vector<CK_OBJECT_HANDLE> pkcs11_core::crypto::TKeyManager::findKeys(const C
     return result;
 }
 
-std::vector<std::map<Attribute, std::string>> pkcs11_core::crypto::TKeyManager::getKeyList(const CK_OBJECT_CLASS objectClass)
+std::vector<std::map<pkcs11_core::Attribute, std::string>> pkcs11_core::crypto::TKeyManager::getKeyList(const CK_OBJECT_CLASS objectClass)
 {
     preCheck();
 
-    vector<map<Attribute, string>> result;
+    std::vector<std::map<Attribute, std::string>> result;
     CK_RV rv = CKR_OK;
-    vector<CK_OBJECT_HANDLE> handles = findKeys(objectClass);
+    std::vector<CK_OBJECT_HANDLE> handles = findKeys(objectClass);
     for(auto &i: handles)
     {
         CK_ATTRIBUTE gettingValueAttr[] =
@@ -573,11 +573,11 @@ std::vector<std::map<Attribute, std::string>> pkcs11_core::crypto::TKeyManager::
             delete[] (CK_BYTE_PTR)gettingValueAttr[1].pValue;
             continue;
         }
-        string label = string((const char*)gettingValueAttr[0].pValue, gettingValueAttr[0].ulValueLen);
-        string id = string((const char*)gettingValueAttr[1].pValue, gettingValueAttr[1].ulValueLen);
-        map<Attribute, string> mTmp;
-        mTmp.insert(std::pair<Attribute, string>(Attribute::LABEL, label));
-        mTmp.insert(std::pair<Attribute, string>(Attribute::ID, id));
+        std::string label = std::string((const char*)gettingValueAttr[0].pValue, gettingValueAttr[0].ulValueLen);
+        std::string id = std::string((const char*)gettingValueAttr[1].pValue, gettingValueAttr[1].ulValueLen);
+        std::map<Attribute, std::string> mTmp;
+        mTmp.insert(std::pair<Attribute, std::string>(Attribute::LABEL, label));
+        mTmp.insert(std::pair<Attribute, std::string>(Attribute::ID, id));
         result.push_back(mTmp);
         delete[] (CK_BYTE_PTR)gettingValueAttr[0].pValue;
         delete[] (CK_BYTE_PTR)gettingValueAttr[1].pValue;
@@ -590,7 +590,7 @@ std::vector<std::map<Attribute, std::string>> pkcs11_core::crypto::TKeyManager::
 void pkcs11_core::crypto::TKeyManager::removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass)
 {
     preCheck();
-    vector<CK_OBJECT_HANDLE> handles = getKeyHandle(keyID, objectClass);
+    std::vector<CK_OBJECT_HANDLE> handles = getKeyHandle(keyID, objectClass);
     for(auto &i: handles)
     {
         pFunctionList->C_DestroyObject(hSession, i);

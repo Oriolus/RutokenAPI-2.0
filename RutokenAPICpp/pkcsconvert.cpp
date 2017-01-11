@@ -7,12 +7,12 @@ pkcs11_core::PkcsConvert::PkcsConvert()
 
 std::string pkcs11_core::PkcsConvert::Bool2Str(const bool value)
 {
-    return value ? string("true") : string("false");
+    return value ? std::string("true") : std::string("false");
 }
 
 bool pkcs11_core::PkcsConvert::Str2Bool(const std::string value)
 {
-    return value == string("true");
+    return value == std::string("true");
 }
 
 CK_BYTE_PTR pkcs11_core::PkcsConvert::Str2CK_BYTE(const std::string &in_str, int64_t *outsize)
@@ -27,20 +27,20 @@ CK_BYTE_PTR pkcs11_core::PkcsConvert::Str2CK_BYTE(const std::string &in_str, int
 
 CK_BYTE_PTR pkcs11_core::PkcsConvert::Str2CK_BYTE(const char *in_str, int64_t *outsize)
 {
-    string tmp = string(in_str);
+    std::string tmp = std::string(in_str);
     return PkcsConvert::Str2CK_BYTE(tmp, outsize);
 }
 
 void pkcs11_core::PkcsConvert::OverwriteStr(std::string *str)
 {
-    string tmp = string(str->size(), (char)0x00);
+    std::string tmp = std::string(str->size(), (char)0x00);
     str->replace(str->begin(), str->end(), tmp.begin(), tmp.end());
 }
 
 std::string pkcs11_core::PkcsConvert::Trim(std::string &str)
 {
     size_t first = str.find_first_not_of(' ');
-    if (string::npos == first)
+    if (std::string::npos == first)
     {
         return str;
     }

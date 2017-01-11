@@ -14,7 +14,7 @@
 
 #ifndef __BYTE_ARRAY__
 #define __BYTE_ARRAY__
-typedef std::vector<byte> byte_array;
+typedef vector<byte> byte_array;
 #endif
 
 namespace pkcs11_core
@@ -29,9 +29,6 @@ namespace crypto
 {
 
 class TKeyManager;
-
-using std::string;
-using std::vector;
 
 class TCryptoManager
 {
