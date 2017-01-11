@@ -1,6 +1,6 @@
 #include "tkeysmanager.h"
 
-TKeyManager::TKeyManager(TokenSession *tSession)
+pkcs11_core::crypto::TKeyManager::TKeyManager(device::TokenSession *tSession)
 {
     srand(time(0));
     session = tSession;
@@ -8,7 +8,7 @@ TKeyManager::TKeyManager(TokenSession *tSession)
     pFunctionList = (CK_FUNCTION_LIST_PTR)tSession->GetFunctionListPtr();
 }
 
-void TKeyManager::preCheck()
+void pkcs11_core::crypto::TKeyManager::preCheck()
 {
     if(hSession == NULL_PTR)
     {
@@ -20,7 +20,7 @@ void TKeyManager::preCheck()
     }
 }
 
-byte_array TKeyManager::createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType)
+byte_array pkcs11_core::crypto::TKeyManager::createKey(map<Attribute, string> &attributes, const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType)
 {
     preCheck();
 
@@ -38,7 +38,7 @@ byte_array TKeyManager::createKey(map<Attribute, string> &attributes, const CK_O
     return byte_array(attributes[Attribute::ID].begin(), attributes[Attribute::ID].end());
 }
 
-map<Attribute, string> TKeyManager::getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
+std::map<Attribute, std::string> pkcs11_core::crypto::TKeyManager::getKeyAttributes(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
     if(!(keyClass != CKO_PRIVATE_KEY || keyClass != CKO_PUBLIC_KEY || keyClass != CKO_SECRET_KEY))
@@ -182,7 +182,7 @@ map<Attribute, string> TKeyManager::getKeyAttributes(const byte_array &keyID, co
    return result;
 }
 
-vector<CK_OBJECT_HANDLE> TKeyManager::getKeyHandle(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
+std::vector<CK_OBJECT_HANDLE> pkcs11_core::crypto::TKeyManager::getKeyHandle(const byte_array &keyID, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
 
@@ -220,7 +220,7 @@ vector<CK_OBJECT_HANDLE> TKeyManager::getKeyHandle(const byte_array &keyID, cons
     return result;
 }
 
-void TKeyManager::overwriteAndFreeAttributes(CK_ATTRIBUTE_PTR attributes)
+void pkcs11_core::crypto::TKeyManager::overwriteAndFreeAttributes(CK_ATTRIBUTE_PTR attributes)
 {
     if(attributes == nullptr)
         return;
@@ -255,7 +255,7 @@ void TKeyManager::overwriteAndFreeAttributes(CK_ATTRIBUTE_PTR attributes)
     }
 }
 
-void TKeyManager::overwriteAndFreeAttributesWithValue(CK_ATTRIBUTE_PTR attributes)
+void pkcs11_core::crypto::TKeyManager::overwriteAndFreeAttributesWithValue(CK_ATTRIBUTE_PTR attributes)
 {
     if(attributes == nullptr)
         return;
@@ -272,7 +272,7 @@ void TKeyManager::overwriteAndFreeAttributesWithValue(CK_ATTRIBUTE_PTR attribute
 
 }
 
-CK_ATTRIBUTE_PTR TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, map<Attribute, string> attributes, int64_t *size)
+CK_ATTRIBUTE_PTR pkcs11_core::crypto::TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClass, const CK_KEY_TYPE keyType, map<Attribute, string> attributes, int64_t *size)
 {
     preCheck();
     if(!(objectClass != CKO_PRIVATE_KEY || objectClass != CKO_SECRET_KEY || objectClass != CKO_PUBLIC_KEY))
@@ -440,7 +440,7 @@ CK_ATTRIBUTE_PTR TKeyManager::getAttributeArray(const CK_OBJECT_CLASS objectClas
     return apAttributes;
 }
 
-CK_BYTE_PTR TKeyManager::generateId(int64_t *size)
+CK_BYTE_PTR pkcs11_core::crypto::TKeyManager::generateId(int64_t *size)
 {
     CK_BYTE_PTR result = nullptr;
 
@@ -454,7 +454,7 @@ CK_BYTE_PTR TKeyManager::generateId(int64_t *size)
     return result;
 }
 
-byte_array TKeyManager::GenerateKeyGOST28147(map<Attribute, string> &attributes)
+byte_array pkcs11_core::crypto::TKeyManager::GenerateKeyGOST28147(map<Attribute, string> &attributes)
 {
     preCheck();
 
@@ -477,22 +477,22 @@ byte_array TKeyManager::GenerateKeyGOST28147(map<Attribute, string> &attributes)
     return returnedID;
 }
 
-vector<map<Attribute, string>> TKeyManager::GetSecretKeyList()
+std::vector<std::map<Attribute, std::string>> pkcs11_core::crypto::TKeyManager::GetSecretKeyList()
 {
     return getKeyList(CKO_SECRET_KEY);
 }
 
-bool TKeyManager::IsSecretKeyExists(const byte_array &keyID)
+bool pkcs11_core::crypto::TKeyManager::IsSecretKeyExists(const byte_array &keyID)
 {
     return getKeyHandle(keyID, CKO_SECRET_KEY).size() > 0;
 }
 
-void TKeyManager::RemoveSecretKey(const byte_array &keyID)
+void pkcs11_core::crypto::TKeyManager::RemoveSecretKey(const byte_array &keyID)
 {
     removeKey(keyID, CKO_SECRET_KEY);
 }
 
-void TKeyManager::RemoveAllKeys()
+void pkcs11_core::crypto::TKeyManager::RemoveAllKeys()
 {
     preCheck();
 
@@ -508,11 +508,11 @@ void TKeyManager::RemoveAllKeys()
     }
 }
 
-void TKeyManager::FreeAttributesTemplate(map<Attribute, string> *attributeTmpl)
+void pkcs11_core::crypto::TKeyManager::FreeAttributesTemplate(std::map<Attribute, string> *attributeTmpl)
 {
 }
 
-vector<CK_OBJECT_HANDLE> TKeyManager::findKeys(const CK_OBJECT_CLASS objectClass)
+std::vector<CK_OBJECT_HANDLE> pkcs11_core::crypto::TKeyManager::findKeys(const CK_OBJECT_CLASS objectClass)
 {
     preCheck();
 
@@ -546,7 +546,7 @@ vector<CK_OBJECT_HANDLE> TKeyManager::findKeys(const CK_OBJECT_CLASS objectClass
     return result;
 }
 
-vector<map<Attribute, string>> TKeyManager::getKeyList(const CK_OBJECT_CLASS objectClass)
+std::vector<std::map<Attribute, std::string>> pkcs11_core::crypto::TKeyManager::getKeyList(const CK_OBJECT_CLASS objectClass)
 {
     preCheck();
 
@@ -587,7 +587,7 @@ vector<map<Attribute, string>> TKeyManager::getKeyList(const CK_OBJECT_CLASS obj
     return result;
 }
 
-void TKeyManager::removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass)
+void pkcs11_core::crypto::TKeyManager::removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass)
 {
     preCheck();
     vector<CK_OBJECT_HANDLE> handles = getKeyHandle(keyID, objectClass);

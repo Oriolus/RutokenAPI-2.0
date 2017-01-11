@@ -2,16 +2,14 @@
 #include <vector>
 #include <map>
 
-#include "rtpkcs11ecplib.h"
-#include "tokensession.h"
-#include "tokenservant.h"
-#include "pkcs_types.h"
-#include "texception.h"
-#include "tcryptomanager.h"
-
-#include "tkeysmanager.h"
+#include "pkcs11_core.h"
 
 using namespace std;
+
+using namespace pkcs11_core;
+using namespace pkcs11_core::lib;
+using namespace pkcs11_core::device;
+using namespace pkcs11_core::crypto;
 
 #define deleteIfNotNull(a) if(a != nullptr) delete a
 

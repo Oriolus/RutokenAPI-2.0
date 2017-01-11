@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include "Common.h"
 
+namespace pkcs11_core
+{
+
 using std::string;
 
 class PkcsConvert
@@ -24,5 +27,7 @@ public:
 private:
     PkcsConvert();
 };
+
+} // pkcs11_core
 
 #endif // PKCSCONVERT_H

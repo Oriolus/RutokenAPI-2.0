@@ -1,6 +1,6 @@
 #include "tcryptomanager.h"
 
-TCryptoManager::TCryptoManager(TokenSession *tSession, TKeyManager *keyManager)
+pkcs11_core::crypto::TCryptoManager::TCryptoManager(device::TokenSession *tSession, TKeyManager *keyManager)
 {
     this->tSession = tSession;
     this->pFunctionList = (CK_FUNCTION_LIST_PTR)tSession->GetFunctionListPtr();
@@ -8,7 +8,12 @@ TCryptoManager::TCryptoManager(TokenSession *tSession, TKeyManager *keyManager)
     this->keyManager = keyManager;
 }
 
-void TCryptoManager::preCheck()
+pkcs11_core::crypto::TCryptoManager::~TCryptoManager()
+{
+
+}
+
+void pkcs11_core::crypto::TCryptoManager::preCheck()
 {
     if(this->pFunctionList == nullptr)
         throw new TException("Function list not loaded", Error::FUNCITON_LIST_NOT_LOADED);
@@ -18,7 +23,7 @@ void TCryptoManager::preCheck()
         throw new TException("Unknown error at TCryptoManager", Error::SESSION_EXISTS);
 }
 
-byte_array TCryptoManager::GetRandom(const int32_t size)
+byte_array pkcs11_core::crypto::TCryptoManager::GetRandom(const int32_t size)
 {
     CK_BYTE_PTR bpRandom = getRandom(size);
     byte_array result((byte*)bpRandom, (byte*)bpRandom + size);
@@ -26,7 +31,7 @@ byte_array TCryptoManager::GetRandom(const int32_t size)
     return result;
 }
 
-CK_BYTE_PTR TCryptoManager::getRandom(const int32_t size)
+CK_BYTE_PTR pkcs11_core::crypto::TCryptoManager::getRandom(const int32_t size)
 {
     preCheck();
     CK_BYTE_PTR result = nullptr;
@@ -40,40 +45,40 @@ CK_BYTE_PTR TCryptoManager::getRandom(const int32_t size)
     return result;
 }
 
-byte_array TCryptoManager::Digest_Gost3411_94(const byte_array &plaintext)
+byte_array pkcs11_core::crypto::TCryptoManager::Digest_Gost3411_94(const byte_array &plaintext)
 {
     return sDigest(plaintext, 32, CKM_GOSTR3411);
 }
 
-byte_array TCryptoManager::Digest_Gost3411_12_256(const byte_array &plaintext)
+byte_array pkcs11_core::crypto::TCryptoManager::Digest_Gost3411_12_256(const byte_array &plaintext)
 {
     return sDigest(plaintext, 32, CKM_GOSTR3411_12_256);
 }
 
-byte_array TCryptoManager::Digest_Gost3411_12_512(const byte_array &plaintext)
+byte_array pkcs11_core::crypto::TCryptoManager::Digest_Gost3411_12_512(const byte_array &plaintext)
 {
     return sDigest(plaintext, 64, CKM_GOSTR3411_12_512);
 }
 
-bool TCryptoManager::IsValidDigest_Gost3411_94(const byte_array &plaintext, const byte_array digest)
+bool pkcs11_core::crypto::TCryptoManager::IsValidDigest_Gost3411_94(const byte_array &plaintext, const byte_array digest)
 {
     byte_array digest1 = Digest_Gost3411_94(plaintext);
     return digest1 == digest;
 }
 
-bool TCryptoManager::IsValidDigest_Gost3411_12_256(const byte_array &plaintext, const byte_array digest)
+bool pkcs11_core::crypto::TCryptoManager::IsValidDigest_Gost3411_12_256(const byte_array &plaintext, const byte_array digest)
 {
     byte_array digest1 = Digest_Gost3411_12_256(plaintext);
     return digest1 == digest;
 }
 
-bool TCryptoManager::IsValidDigest_Gost3411_12_512(const byte_array &plaintext, const byte_array digest)
+bool pkcs11_core::crypto::TCryptoManager::IsValidDigest_Gost3411_12_512(const byte_array &plaintext, const byte_array digest)
 {
     byte_array digest1 = Digest_Gost3411_12_512(plaintext);
     return digest1 == digest;
 }
 
-byte_array TCryptoManager::sDigest(const byte_array &plaintext, const uint64_t lDigestSize, const CK_MECHANISM_TYPE digestMech)
+byte_array pkcs11_core::crypto::TCryptoManager::sDigest(const byte_array &plaintext, const uint64_t lDigestSize, const CK_MECHANISM_TYPE digestMech)
 {
     uint64_t lPlainTextSize = plaintext.size();
     uint64_t lTmpDigestSize = lDigestSize;
@@ -84,7 +89,7 @@ byte_array TCryptoManager::sDigest(const byte_array &plaintext, const uint64_t l
     return  result;
 }
 
-CK_BYTE_PTR TCryptoManager::digest(const CK_BYTE_PTR bpPlaintext, const uint64_t lPlaintextSize,
+CK_BYTE_PTR pkcs11_core::crypto::TCryptoManager::digest(const CK_BYTE_PTR bpPlaintext, const uint64_t lPlaintextSize,
                                    uint64_t *lDigestSize,
                                    const CK_MECHANISM_TYPE digestMech)
 {
@@ -108,25 +113,25 @@ CK_BYTE_PTR TCryptoManager::digest(const CK_BYTE_PTR bpPlaintext, const uint64_t
     return bpTmpDigest;
 }
 
-byte_array TCryptoManager::Encrypt_Gost28147(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV)
+byte_array pkcs11_core::crypto::TCryptoManager::Encrypt_Gost28147(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV)
 {
     return sEncrypt(keyID, plaintext, IV, CKM_GOST28147, CKO_SECRET_KEY);
 }
 
-byte_array TCryptoManager::Encrypt_Gost28147_ECB(const byte_array &keyID, byte_array &plaintext)
+byte_array pkcs11_core::crypto::TCryptoManager::Encrypt_Gost28147_ECB(const byte_array &keyID, byte_array &plaintext)
 {
     while(plaintext.size() % 8 != 0)
         plaintext.push_back((byte)0);
     return sEncrypt(keyID, plaintext, nullptr, CKM_GOST28147_ECB, CKO_SECRET_KEY);
 }
 
-byte_array TCryptoManager::Decrypt_Gost28147_ECB(const byte_array &keyID, const byte_array &ciphertext)
+byte_array pkcs11_core::crypto::TCryptoManager::Decrypt_Gost28147_ECB(const byte_array &keyID, const byte_array &ciphertext)
 {
     return sDecrypt(keyID, ciphertext, nullptr, CKM_GOST28147_ECB, CKO_SECRET_KEY);
 }
 
 
-CK_BYTE_PTR TCryptoManager::encrypt(const CK_OBJECT_HANDLE hKey,
+CK_BYTE_PTR pkcs11_core::crypto::TCryptoManager::encrypt(const CK_OBJECT_HANDLE hKey,
                                     CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize,
                                     CK_BYTE_PTR bpIV, const CK_ULONG lIVSize,
                                     uint64_t *lCiphertextSize,
@@ -159,7 +164,7 @@ CK_BYTE_PTR TCryptoManager::encrypt(const CK_OBJECT_HANDLE hKey,
     return bpCiphertext;
 }
 
-byte_array TCryptoManager::sEncrypt(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const CK_MECHANISM_TYPE encMechType, const CK_OBJECT_CLASS keyClass)
+byte_array pkcs11_core::crypto::TCryptoManager::sEncrypt(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const CK_MECHANISM_TYPE encMechType, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
     vector<CK_OBJECT_HANDLE> keysHandles = this->keyManager->getKeyHandle(keyID, keyClass);
@@ -175,12 +180,12 @@ byte_array TCryptoManager::sEncrypt(const byte_array &keyID, const byte_array &p
     return result;
 }
 
-byte_array TCryptoManager::Decrypt_Gost28147(const byte_array &keyID, const byte_array &ciphertext, const byte_array *IV)
+byte_array pkcs11_core::crypto::TCryptoManager::Decrypt_Gost28147(const byte_array &keyID, const byte_array &ciphertext, const byte_array *IV)
 {
     return sDecrypt(keyID, ciphertext, IV, CKM_GOST28147, CKO_SECRET_KEY);
 }
 
-CK_BYTE_PTR TCryptoManager::decrypt(const CK_OBJECT_HANDLE hKey,
+CK_BYTE_PTR pkcs11_core::crypto::TCryptoManager::decrypt(const CK_OBJECT_HANDLE hKey,
                                     const CK_BYTE_PTR bpCiphertext, const CK_ULONG lCiphertextSize,
                                     const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize,
                                     uint64_t *lPlaintextSize,
@@ -214,7 +219,7 @@ CK_BYTE_PTR TCryptoManager::decrypt(const CK_OBJECT_HANDLE hKey,
     return bpPlaintext;
 }
 
-byte_array TCryptoManager::sDecrypt(const byte_array &keyID, const byte_array &ciphertext, const byte_array *IV, const CK_MECHANISM_TYPE decMechType, const CK_OBJECT_CLASS keyClass)
+byte_array pkcs11_core::crypto::TCryptoManager::sDecrypt(const byte_array &keyID, const byte_array &ciphertext, const byte_array *IV, const CK_MECHANISM_TYPE decMechType, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
 
@@ -232,17 +237,17 @@ byte_array TCryptoManager::sDecrypt(const byte_array &keyID, const byte_array &c
     return result;
 }
 
-byte_array TCryptoManager::MAC_Gost28147_SIGN(const byte_array &keyID, const byte_array &plaintext, const byte_array &IV)
+byte_array pkcs11_core::crypto::TCryptoManager::MAC_Gost28147_SIGN(const byte_array &keyID, const byte_array &plaintext, const byte_array &IV)
 {
     return sMac(keyID, plaintext, &IV, 4, CKM_GOST28147_MAC, CKO_SECRET_KEY);
 }
 
-bool TCryptoManager::MAC_Gost28147_VERIFY(const byte_array &keyID, const byte_array &plaintext, const byte_array &IV, const byte_array &signature)
+bool pkcs11_core::crypto::TCryptoManager::MAC_Gost28147_VERIFY(const byte_array &keyID, const byte_array &plaintext, const byte_array &IV, const byte_array &signature)
 {
     return isSignatureCorrect(keyID, plaintext, &IV, signature, CKM_GOST28147_MAC, CKO_SECRET_KEY);
 }
 
-CK_BYTE_PTR TCryptoManager::mac(const CK_OBJECT_HANDLE hKey,
+CK_BYTE_PTR pkcs11_core::crypto::TCryptoManager::mac(const CK_OBJECT_HANDLE hKey,
                                 const CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize,
                                 const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize,
                                 const uint64_t lMacSize,
@@ -268,7 +273,7 @@ CK_BYTE_PTR TCryptoManager::mac(const CK_OBJECT_HANDLE hKey,
     return bpMac;
 }
 
-byte_array TCryptoManager::sMac(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const uint64_t lMacSize, const CK_MECHANISM_TYPE macMechType, const CK_OBJECT_CLASS keyClass)
+byte_array pkcs11_core::crypto::TCryptoManager::sMac(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const uint64_t lMacSize, const CK_MECHANISM_TYPE macMechType, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
 
@@ -287,7 +292,7 @@ byte_array TCryptoManager::sMac(const byte_array &keyID, const byte_array &plain
     return result;
 }
 
-bool TCryptoManager::verify(const CK_OBJECT_HANDLE hKey, const CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize, const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize, const CK_BYTE_PTR bpSignature, const CK_ULONG lSignatureSize, const CK_MECHANISM_TYPE verMechType)
+bool pkcs11_core::crypto::TCryptoManager::verify(const CK_OBJECT_HANDLE hKey, const CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize, const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize, const CK_BYTE_PTR bpSignature, const CK_ULONG lSignatureSize, const CK_MECHANISM_TYPE verMechType)
 {
     preCheck();
 
@@ -303,7 +308,7 @@ bool TCryptoManager::verify(const CK_OBJECT_HANDLE hKey, const CK_BYTE_PTR bpPla
     return rv == CKR_OK;
 }
 
-bool TCryptoManager::isSignatureCorrect(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const byte_array &signature, const CK_MECHANISM_TYPE verMechType, const CK_OBJECT_CLASS keyClass)
+bool pkcs11_core::crypto::TCryptoManager::isSignatureCorrect(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const byte_array &signature, const CK_MECHANISM_TYPE verMechType, const CK_OBJECT_CLASS keyClass)
 {
     preCheck();
 

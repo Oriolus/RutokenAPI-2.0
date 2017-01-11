@@ -17,6 +17,17 @@
 typedef std::vector<byte> byte_array;
 #endif
 
+namespace pkcs11_core
+{
+
+#ifndef __BYTE_ARRAY__
+#define __BYTE_ARRAY__
+typedef std::vector<byte> byte_array;
+#endif
+
+namespace crypto
+{
+
 class TKeyManager;
 
 using std::string;
@@ -25,7 +36,8 @@ using std::vector;
 class TCryptoManager
 {
 public:
-    TCryptoManager(TokenSession *tSession, TKeyManager *keyManager);
+    TCryptoManager(device::TokenSession *tSession, TKeyManager *keyManager);
+    ~TCryptoManager();
 
     byte_array              GetRandom(const int32_t size);
 
@@ -49,7 +61,7 @@ public:
     void                    SetSessionHandle(const uint64_t hSession) { this->hSession = (CK_SESSION_HANDLE)hSession; }
 
 private:
-    TokenSession            *tSession;
+    device::TokenSession    *tSession;
     TKeyManager             *keyManager;
     CK_SESSION_HANDLE       hSession;
     CK_FUNCTION_LIST_PTR    pFunctionList;
@@ -69,9 +81,15 @@ private:
     CK_BYTE_PTR             mac(const CK_OBJECT_HANDLE hKey, const CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize, const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize, const uint64_t lMacSize, const CK_MECHANISM_TYPE macMechType);
     byte_array              sMac(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const uint64_t lMacSize, const CK_MECHANISM_TYPE macMechType, const CK_OBJECT_CLASS keyClass);
 
-    bool                   verify(const CK_OBJECT_HANDLE hKey, const CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize, const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize, const CK_BYTE_PTR bpSignature, const CK_ULONG lSignatureSize, const CK_MECHANISM_TYPE verMechType);
-    bool                   isSignatureCorrect(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const byte_array &signature, const CK_MECHANISM_TYPE verMechType, const CK_OBJECT_CLASS keyClass);
+    bool                    verify(const CK_OBJECT_HANDLE hKey, const CK_BYTE_PTR bpPlaintext, const CK_ULONG lPlaintextSize, const CK_BYTE_PTR bpIV, const CK_ULONG lIVSize, const CK_BYTE_PTR bpSignature, const CK_ULONG lSignatureSize, const CK_MECHANISM_TYPE verMechType);
+    bool                    isSignatureCorrect(const byte_array &keyID, const byte_array &plaintext, const byte_array *IV, const byte_array &signature, const CK_MECHANISM_TYPE verMechType, const CK_OBJECT_CLASS keyClass);
 
 };
+
+}
+}
+
+
+
 
 #endif // TCRYPTOMANAGER_H

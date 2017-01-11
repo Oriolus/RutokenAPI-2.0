@@ -1,21 +1,21 @@
 #include "pkcsconvert.h"
 
-PkcsConvert::PkcsConvert()
+pkcs11_core::PkcsConvert::PkcsConvert()
 {
 
 }
 
-string PkcsConvert::Bool2Str(const bool value)
+std::string pkcs11_core::PkcsConvert::Bool2Str(const bool value)
 {
     return value ? string("true") : string("false");
 }
 
-bool PkcsConvert::Str2Bool(const string value)
+bool pkcs11_core::PkcsConvert::Str2Bool(const std::string value)
 {
     return value == string("true");
 }
 
-CK_BYTE_PTR PkcsConvert::Str2CK_BYTE(const string &in_str, int64_t *outsize)
+CK_BYTE_PTR pkcs11_core::PkcsConvert::Str2CK_BYTE(const std::string &in_str, int64_t *outsize)
 {
     if(outsize == nullptr)
         return nullptr;
@@ -25,19 +25,19 @@ CK_BYTE_PTR PkcsConvert::Str2CK_BYTE(const string &in_str, int64_t *outsize)
     return result;
 }
 
-CK_BYTE_PTR PkcsConvert::Str2CK_BYTE(const char *in_str, int64_t *outsize)
+CK_BYTE_PTR pkcs11_core::PkcsConvert::Str2CK_BYTE(const char *in_str, int64_t *outsize)
 {
     string tmp = string(in_str);
     return PkcsConvert::Str2CK_BYTE(tmp, outsize);
 }
 
-void PkcsConvert::OverwriteStr(string *str)
+void pkcs11_core::PkcsConvert::OverwriteStr(std::string *str)
 {
     string tmp = string(str->size(), (char)0x00);
     str->replace(str->begin(), str->end(), tmp.begin(), tmp.end());
 }
 
-string PkcsConvert::Trim(std::string &str)
+std::string pkcs11_core::PkcsConvert::Trim(std::string &str)
 {
     size_t first = str.find_first_not_of(' ');
     if (string::npos == first)
@@ -48,14 +48,14 @@ string PkcsConvert::Trim(std::string &str)
     return str.substr(first, (last - first + 1));
 }
 
-void PkcsConvert::OverwriteByteArray(byte_array *ba)
+void pkcs11_core::PkcsConvert::OverwriteByteArray(byte_array *ba)
 {
     unsigned char *ba_data = (unsigned char*)ba->data();
     for(size_t i = 0; i < ba->size(); i++)
         ba_data[i] = 0x00;
 }
 
-CK_BYTE_PTR PkcsConvert::ByteArray2CK_BYTE(const byte_array &ba, int64_t *outsize)
+CK_BYTE_PTR pkcs11_core::PkcsConvert::ByteArray2CK_BYTE(const byte_array &ba, int64_t *outsize)
 {
     *outsize = 0;
     CK_BYTE_PTR result = new CK_BYTE[ba.size()];
@@ -65,7 +65,7 @@ CK_BYTE_PTR PkcsConvert::ByteArray2CK_BYTE(const byte_array &ba, int64_t *outsiz
     return result;
 }
 
-byte_array PkcsConvert::TrimBA(byte_array &ba)
+byte_array pkcs11_core::PkcsConvert::TrimBA(byte_array &ba)
 {
     int space_q = 0;
     for(; ba[ba.size() - 1 - space_q] == ' '; space_q++);

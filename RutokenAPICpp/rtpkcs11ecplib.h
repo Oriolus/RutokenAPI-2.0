@@ -7,6 +7,12 @@
 
 #include <string>
 
+namespace pkcs11_core
+{
+
+namespace lib
+{
+
 class RtPKCS11EcpLib
 {
 public:
@@ -33,5 +39,9 @@ private:
     cosnt LPCWSTR defaultLibPath = L"./lib/librtpkcs11ecp.so";
 #endif
 };
+
+} // lib
+} // pkcs11_core
+
 
 #endif // RTPKCS11ECPLIB_H

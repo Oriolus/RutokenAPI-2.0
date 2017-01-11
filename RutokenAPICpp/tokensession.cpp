@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 
-TokenSession::TokenSession(void *pFunctionList, void *pExFunctionList)
+pkcs11_core::device::TokenSession::TokenSession(void *pFunctionList, void *pExFunctionList)
 {
     if(pFunctionList == nullptr)
     {
@@ -19,19 +19,19 @@ TokenSession::TokenSession(void *pFunctionList, void *pExFunctionList)
     aSlot = -1;
 }
 
-TokenSession::~TokenSession()
+pkcs11_core::device::TokenSession::~TokenSession()
 {
     std::cout << "~TokenSession" << std::endl;
     CloseSessionsOnSlot();
 }
 
-void TokenSession::preCheck()
+void pkcs11_core::device::TokenSession::preCheck()
 {
     if(pFunctionList == nullptr)
         throw new TException("Function list not loaded", Error::FUNCITON_LIST_NOT_LOADED);
 }
 
-void TokenSession::openSessionOnSlot(const int64_t slot)
+void pkcs11_core::device::TokenSession::openSessionOnSlot(const int64_t slot)
 {
     preCheck();
     CK_SLOT_ID _slotId = (CK_ULONG)slot;
@@ -44,12 +44,12 @@ void TokenSession::openSessionOnSlot(const int64_t slot)
     aSlot = slot;
 }
 
-void TokenSession::OpenSessionOnSlot(const int64_t slot)
+void pkcs11_core::device::TokenSession::OpenSessionOnSlot(const int64_t slot)
 {
     openSessionOnSlot(slot);
 }
 
-byte_array TokenSession::getSerial()
+byte_array pkcs11_core::device::TokenSession::getSerial()
 {
     preCheck();
     if(this->aSlot == -1)
@@ -71,7 +71,7 @@ byte_array TokenSession::getSerial()
     return result;
 }
 
-void TokenSession::login(const int64_t user, const std::string &pin)
+void pkcs11_core::device::TokenSession::login(const int64_t user, const std::string &pin)
 {
     preCheck();
     CK_ULONG lPinSize = (CK_ULONG)pin.size();
@@ -82,17 +82,17 @@ void TokenSession::login(const int64_t user, const std::string &pin)
     }
 }
 
-void TokenSession::Login(const int64_t user, std::string &pin)
+void pkcs11_core::device::TokenSession::Login(const int64_t user, std::string &pin)
 {
     login(user, pin);
 }
 
-void TokenSession::Logout()
+void pkcs11_core::device::TokenSession::Logout()
 {
     logout();
 }
 
-void TokenSession::logout()
+void pkcs11_core::device::TokenSession::logout()
 {
     preCheck();
 
@@ -108,7 +108,7 @@ void TokenSession::logout()
     }
 }
 
-void TokenSession::closeSessions()
+void pkcs11_core::device::TokenSession::closeSessions()
 {
     logout();
     if(aSlot != -1)
@@ -123,26 +123,26 @@ void TokenSession::closeSessions()
     }
 }
 
-void TokenSession::CloseSessionsOnSlot()
+void pkcs11_core::device::TokenSession::CloseSessionsOnSlot()
 {
     logout();
     closeSessions();
     aSlot = -1;
 }
 
-void TokenSession::Reconnect(const int64_t user, std::string &pin)
+void pkcs11_core::device::TokenSession::Reconnect(const int64_t user, std::string &pin)
 {
     closeSessions();
     openSessionOnSlot(aSlot);
     login(user, pin);
 }
 
-byte_array TokenSession::GetTokenSerial()
+byte_array pkcs11_core::device::TokenSession::GetTokenSerial()
 {
     return getSerial();
 }
 
-bool TokenSession::IsSessionOpened()
+bool pkcs11_core::device::TokenSession::IsSessionOpened()
 {
     preCheck();
     if(hSession == NULL_PTR)

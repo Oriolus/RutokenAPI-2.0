@@ -13,17 +13,22 @@
 #include "pkcsconvert.h"
 #include "tcryptomanager.h"
 
-class TCryptoManager;
-
+namespace pkcs11_core
+{
 using std::string;
 using std::map;
 using std::vector;
+
+namespace crypto
+{
+
+class TCryptoManager;
 
 class TKeyManager
 {
     friend class TCryptoManager;
 public:
-    TKeyManager(TokenSession *tSession);
+    TKeyManager(device::TokenSession *tSession);
 
     byte_array                                  GenerateKeyGOST28147(map<Attribute, string> &attributes);
     vector<map<Attribute, string>>              GetSecretKeyList();
@@ -52,7 +57,7 @@ private:
     vector<map<Attribute, string>>              getKeyList(const CK_OBJECT_CLASS objectClass);
     void                                        removeKey(const byte_array &keyID, const CK_OBJECT_CLASS objectClass);
 
-    TokenSession                                *session;
+    device::TokenSession                        *session;
     CK_SESSION_HANDLE                           hSession;
     CK_FUNCTION_LIST_PTR                        pFunctionList;
 
@@ -77,5 +82,10 @@ private:
     CK_BYTE                                     GOST28147_params_oid[9] = { 0x06, 0x07, 0x2a, 0x85, 0x03, 0x02, 0x02, 0x1f, 0x01 };
 
 };
+
+} // crypto
+} // pkcs11_core
+
+
 
 #endif // TKEYSMANAGER_H

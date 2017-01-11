@@ -9,6 +9,12 @@
 #include <vector>
 #include <iostream>
 
+namespace pkcs11_core
+{
+
+namespace device
+{
+
 class TokenServant
 {
 public:
@@ -27,5 +33,9 @@ private:
     TokenInfo                       getTokenInfo(int32_t slot);
     int32_t                         findTokenOnSlot(const std::string &serial);
 };
+
+} // device
+} // pkcs11_core
+
 
 #endif // TOKENSERVANT_H

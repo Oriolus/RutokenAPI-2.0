@@ -17,6 +17,12 @@
 
 #include <string>
 
+namespace pkcs11_core
+{
+
+namespace device
+{
+
 class TokenSession
 {
 public:
@@ -49,5 +55,8 @@ private:
     void                            logout();
     byte_array                      getSerial();
 };
+
+} // device
+} // pkcs11_core
 
 #endif // TOKENSESSION_H
