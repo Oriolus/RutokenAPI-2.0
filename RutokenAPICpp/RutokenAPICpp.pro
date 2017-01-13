@@ -32,4 +32,5 @@ HEADERS += \
     include_rt/rtpkcs11t.h \
     include_rt/rtRusPKCS11.h \
     include_rt/win2nix.h \
-    include_rt/wintypes.h
+    include_rt/wintypes.h \
+    pkcs11_core.h

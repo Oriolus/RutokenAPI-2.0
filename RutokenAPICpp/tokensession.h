@@ -17,6 +17,12 @@
 
 #include <string>
 
+namespace pkcs11_core
+{
+
+namespace device
+{
+
 class TokenSession
 {
 public:
@@ -29,7 +35,7 @@ public:
     void                            CloseSessionsOnSlot();
     void                            Reconnect(const int64_t user, std::string &pin);
 
-    std::string                     GetTokenSerial();
+    byte_array                      GetTokenSerial();
     bool                            IsSessionOpened();
 
     void                            *GetFunctionListPtr() { return pFunctionList; }
@@ -47,7 +53,10 @@ private:
     void                            closeSessions();
     void                            login(const int64_t user, const std::string &pin);
     void                            logout();
-    std::string                     getSerial();
+    byte_array                      getSerial();
 };
+
+} // device
+} // pkcs11_core
 
 #endif // TOKENSESSION_H

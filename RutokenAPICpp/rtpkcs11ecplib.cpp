@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-RtPKCS11EcpLib::RtPKCS11EcpLib()
+pkcs11_core::lib::RtPKCS11EcpLib::RtPKCS11EcpLib()
 {
     this->pFunctionList = nullptr;
     this->pExFunctionList = nullptr;
@@ -41,28 +41,7 @@ RtPKCS11EcpLib::RtPKCS11EcpLib()
         finalizeLib();
         throw new TException("Function list not initialized", Error::FUNCTION_LIST_NOT_INITIALIZED);
     }
-/*
-    CK_C_EX_GetFunctionListExtended pfGetFunctionListEx = nullptr;
 
-#ifdef __unix__
-#endif
-#ifdef _WIN32
-    pfGetFunctionListEx = (CK_C_EX_GetFunctionListExtended)(GetProcAddress((HMODULE)hModule, "C_EX_GetFunctionListExtended"));
-#endif
-
-    if(pfGetFunctionListEx == nullptr)
-    {
-        finalizeLib();
-        throw new TException("Extended function list not loaded", Error::FUNCITON_LIST_NOT_LOADED);
-    }
-
-    rv = pfGetFunctionListEx(&pExFunctionList);
-    if(rv != CKR_OK)
-    {
-        finalizeLib();
-        throw new TException("Extended function list not initialized", Error::FUNCTION_LIST_NOT_INITIALIZED);
-    }
-*/
     rv = pFunctionList->C_Initialize(nullptr);
     if(rv != CKR_OK)
     {
@@ -71,13 +50,13 @@ RtPKCS11EcpLib::RtPKCS11EcpLib()
     }
 }
 
-RtPKCS11EcpLib::~RtPKCS11EcpLib()
+pkcs11_core::lib::RtPKCS11EcpLib::~RtPKCS11EcpLib()
 {
     std::cout << "~RtPKCS11EcpLib" << std::endl;
     finalizeLib();
 }
 
-void RtPKCS11EcpLib::LoadPkcsLibrary(const std::string path)
+void pkcs11_core::lib::RtPKCS11EcpLib::LoadPkcsLibrary(const std::string path)
 {
     if(hModule != nullptr)
         finalizeLib();
@@ -120,28 +99,6 @@ void RtPKCS11EcpLib::LoadPkcsLibrary(const std::string path)
         finalizeLib();
         throw new TException("Function list not initialized", Error::FUNCTION_LIST_NOT_INITIALIZED);
     }
-/*
-    CK_C_EX_GetFunctionListExtended pfGetFunctionListEx = nullptr;
-
-#ifdef __unix__
-#endif
-#ifdef _WIN32
-    pfGetFunctionListEx = (CK_C_EX_GetFunctionListExtended)(GetProcAddress((HMODULE)hModule, "C_EX_GetFunctionListExtended"));
-#endif
-
-    if(pfGetFunctionListEx == nullptr)
-    {
-        finalizeLib();
-        throw new TException("Extended function list not loaded", Error::FUNCITON_LIST_NOT_LOADED);
-    }
-
-    rv = pfGetFunctionListEx(&pExFunctionList);
-    if(rv != CKR_OK)
-    {
-        finalizeLib();
-        throw new TException("Extended function list not initialized", Error::FUNCTION_LIST_NOT_INITIALIZED);
-    }
-*/
     rv = pFunctionList->C_Initialize(nullptr);
     if(rv != CKR_OK)
     {
@@ -150,12 +107,7 @@ void RtPKCS11EcpLib::LoadPkcsLibrary(const std::string path)
     }
 }
 
-void RtPKCS11EcpLib::FinalizeLib()
-{
-    finalizeLib();
-}
-
-void RtPKCS11EcpLib::finalizeLib()
+void pkcs11_core::lib::RtPKCS11EcpLib::finalizeLib()
 {
     if(pFunctionList != nullptr)
         pFunctionList->C_Finalize(nullptr);
@@ -173,3 +125,10 @@ void RtPKCS11EcpLib::finalizeLib()
     }
     hModule = nullptr;
 }
+
+void pkcs11_core::lib::RtPKCS11EcpLib::FinalizeLib()
+{
+    finalizeLib();
+}
+
+

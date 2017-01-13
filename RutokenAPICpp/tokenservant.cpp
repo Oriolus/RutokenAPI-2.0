@@ -1,28 +1,28 @@
 #include "tokenservant.h"
 
-TokenServant::TokenServant(void *pFunctionList, void *pExFunctionList)
+pkcs11_core::device::TokenServant::TokenServant(void *pFunctionList, void *pExFunctionList)
 {
     this->pFunctionList = (CK_FUNCTION_LIST_PTR)pFunctionList;
     this->pExFunctionList = (CK_FUNCTION_LIST_EXTENDED_PTR)pExFunctionList;
 }
 
-TokenServant::~TokenServant()
+pkcs11_core::device::TokenServant::~TokenServant()
 {
     std::cout << "~TokenServant" << std::endl;
 }
 
-void TokenServant::preCheck()
+void pkcs11_core::device::TokenServant::preCheck()
 {
     if(pFunctionList == nullptr)
         throw new TException("Function list is not loaded", Error::FUNCITON_LIST_NOT_LOADED);
 }
 
-std::vector<TokenInfo> TokenServant::GetTokenList()
+std::vector<pkcs11_core::TokenInfo> pkcs11_core::device::TokenServant::GetTokenList()
 {
     return getTokenList();
 }
 
-std::vector<TokenInfo> TokenServant::getTokenList()
+std::vector<pkcs11_core::TokenInfo> pkcs11_core::device::TokenServant::getTokenList()
 {
     preCheck();
 
@@ -57,7 +57,7 @@ std::vector<TokenInfo> TokenServant::getTokenList()
     return tInfo;
 }
 
-TokenInfo TokenServant::GetTokenInfo(const std::string &serial)
+pkcs11_core::TokenInfo pkcs11_core::device::TokenServant::GetTokenInfo(const std::string &serial)
 {
     TokenInfo ti;
 
@@ -68,7 +68,7 @@ TokenInfo TokenServant::GetTokenInfo(const std::string &serial)
     return ti;
 }
 
-TokenInfo TokenServant::getTokenInfo(int32_t slot)
+pkcs11_core::TokenInfo pkcs11_core::device::TokenServant::getTokenInfo(int32_t slot)
 {
     preCheck();
     if(slot == -1)
@@ -112,12 +112,12 @@ TokenInfo TokenServant::getTokenInfo(int32_t slot)
     return result;
 }
 
-int32_t TokenServant::FinTokenOnSlot(const std::string &serial)
+int32_t pkcs11_core::device::TokenServant::FinTokenOnSlot(const std::string &serial)
 {
     return findTokenOnSlot(serial);
 }
 
-int32_t TokenServant::findTokenOnSlot(const std::string &serial)
+int32_t pkcs11_core::device::TokenServant::findTokenOnSlot(const std::string &serial)
 {
     std::vector<TokenInfo> tokens = getTokenList();
     for(TokenInfo &ti: tokens)

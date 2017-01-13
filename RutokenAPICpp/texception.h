@@ -4,18 +4,21 @@
 #include <string>
 #include "enums.h"
 
-class TException
+namespace pkcs11_core
 {
-private:
-    std::string message;
-    Error code;
-public:
-    TException();
-    TException(std::string &message, Error code);
-    TException(const char *message, Error code);
-    TException(const char *message, size_t msgLength, Error code);
-    std::string     GetReason() { return this->message; }
-    Error           GetCode() { return this->code; }
-};
+    class TException
+    {
+    private:
+        std::string message;
+        Error code;
+    public:
+        TException();
+        TException(std::string &message, Error code);
+        TException(const char *message, Error code);
+        TException(const char *message, size_t msgLength, Error code);
+        std::string     GetReason() { return this->message; }
+        Error           GetCode() { return this->code; }
+    };
+}
 
 #endif // TEXCEPTION_H

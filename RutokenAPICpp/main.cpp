@@ -2,24 +2,16 @@
 #include <vector>
 #include <map>
 
-#include "rtpkcs11ecplib.h"
-#include "tokensession.h"
-#include "tokenservant.h"
-#include "pkcs_types.h"
-#include "texception.h"
-#include "tcryptomanager.h"
-
-#include "tkeysmanager.h"
+#include "pkcs11_core.h"
 
 using namespace std;
 
+using namespace pkcs11_core;
+using namespace pkcs11_core::lib;
+using namespace pkcs11_core::device;
+using namespace pkcs11_core::crypto;
+
 #define deleteIfNotNull(a) if(a != nullptr) delete a
-
-#ifndef __BYTE_ARRAY__
-#define __BYTE_ARRAY__
-typedef std::vector<unsigned char> ByteArray;
-#endif
-
 
 int main(int argc, char *argv[])
 {
@@ -82,7 +74,7 @@ int main(int argc, char *argv[])
         delete te;
     }
 
-    string keyID = "";
+    byte_array keyID;
     try
     {
         map<Attribute, string> secKeyTmpl;
@@ -100,7 +92,7 @@ int main(int argc, char *argv[])
             cout << mKeys[Attribute::LABEL] << endl;
             cout << endl;
         }
-        keyID = sKeyList[0][Attribute::ID];
+        keyID = byte_array(sKeyList[0][Attribute::ID].begin(), sKeyList[0][Attribute::ID].end());
         cout << "Keys printed" << endl;
     }
     catch(TException *te)
@@ -109,40 +101,44 @@ int main(int argc, char *argv[])
         delete te;
     }
 
-    cout << "KeyID size: " << keyID << endl;
-    cout << "KeyID: " << keyID << endl;
+    cout << "KeyID size: " << keyID.size() << endl;
+    cout << "KeyID: " << string(keyID.begin(), keyID.end()) << endl;
 
     /* DIGEST TESTING */
     try
     {
-        string plaintext = "Plaintext for hash";
-        cout << "Plaintext: " << plaintext << endl;
+        cout << "DIGEST TESTING" << endl;
+        string sPlaintext = "Plaintext for hash";
+        cout << "\tPlaintext: " << sPlaintext << endl;
+        byte_array plaintext(sPlaintext.begin(), sPlaintext.end());
 
-        string digest_94 = crypto->Digest_Gost3411_94(plaintext);
+        byte_array digest_94 = crypto->Digest_Gost3411_94(plaintext);
         cout << "\tDigest 94 size: " << digest_94.size() << endl;
-        cout << "\tDigest 94: " << digest_94 << endl;
+        cout << "\tDigest 94: " << string(digest_94.begin(), digest_94.end()) << endl;
         if(crypto->IsValidDigest_Gost3411_94(plaintext, digest_94)) cout << "\tDigest is valid" << endl;
         else cout << "\tDigest is invalid" << endl;
+        cout << endl;
 
-        string digest_12_256 = crypto->Digest_Gost3411_12_256(plaintext);
+        byte_array digest_12_256 = crypto->Digest_Gost3411_12_256(plaintext);
         cout << "\tDigest 2012 256 size: " << digest_12_256.size() << endl;
-        cout << "\tDigest 2012 256: " << digest_12_256 << endl;
+        cout << "\tDigest 2012 256: " << string(digest_12_256.begin(), digest_12_256.end()) << endl;
         if(crypto->IsValidDigest_Gost3411_12_256(plaintext, digest_12_256)) cout << "\tDigest is valid" << endl;
         else cout << "\tDigest is invalid" << endl;
+        cout << endl;
 
-        string digest_12_512 = crypto->Digest_Gost3411_12_512(plaintext);
+        byte_array digest_12_512 = crypto->Digest_Gost3411_12_512(plaintext);
         cout << "\tDigest 2012 512 size: " << digest_12_512.size() << endl;
-        cout << "\tDigest 2012 512: " << digest_12_512 << endl;
+        cout << "\tDigest 2012 512: " << string(digest_12_512.begin(), digest_12_512.end()) << endl;
         if(crypto->IsValidDigest_Gost3411_12_512(plaintext, digest_12_512)) cout << "\tDigest is valid" << endl;
         else cout << "\tDigest is invalid" << endl;
+        cout << endl;
 
         int randomSize = 8;
-        string random = crypto->GetRandom(randomSize);
+        byte_array random = crypto->GetRandom(randomSize);
         int8_t *tmp = (int8_t*)random.data();
         for(size_t i = 0; i < randomSize; i++)
             cout << (int)tmp[i] << " ";
         cout << endl;
-
     }
     catch(TException *te)
     {
@@ -151,26 +147,29 @@ int main(int argc, char *argv[])
     }
 
     /* ENCRYPT/DECRYPT TESTING */
+
     cout << endl;
     try
     {
         cout << "GOST 28147-89 CBC TESTING" << endl;
-        string plaintext = "Plaintext for enc/dec";
-        string iv = "initvect";
-        cout << "\tPlaintext size: " << plaintext.size() << endl;
-        cout << "\tPlaintext: " << plaintext << endl;
-        cout << "\tIV size: " << iv.size() << endl;
-        cout << "\tIV: " << iv << endl;
+        string sPlaintext = "Plaintext for enc/dec";
+        string sIv = "initvect";
+        cout << "\tPlaintext size: " << sPlaintext.size() << endl;
+        cout << "\tPlaintext: " << sPlaintext << endl;
+        cout << "\tIV size: " << sIv.size() << endl;
+        cout << "\tIV: " << sIv << endl;
         cout << endl;
 
-        string ciphertext = crypto->Encrypt_Gost28147(keyID, plaintext, &iv);
+        byte_array plaintext(sPlaintext.begin(), sPlaintext.end());
+        byte_array iv(sIv.begin(), sIv.end());
+        byte_array ciphertext = crypto->Encrypt_Gost28147(keyID, plaintext, &iv);
         cout << "\tCiphertext size: " << ciphertext.size() << endl;
-        cout << "\tCiphertext" << ciphertext << endl;
+        cout << "\tCiphertext" << string(ciphertext.begin(), ciphertext.end()) << endl;
         cout << endl;
 
-        string _plaintext = crypto->Decrypt_Gost28147(keyID, ciphertext, &iv);
+        byte_array _plaintext = crypto->Decrypt_Gost28147(keyID, ciphertext, &iv);
         cout << "\tDeciphered size: " << _plaintext.size() << endl;
-        cout << "\tDeciphered: " << _plaintext << endl;
+        cout << "\tDeciphered: " << string(_plaintext.begin(), _plaintext.end()) << endl;
 
         if(plaintext == _plaintext) cout << "\tPlaintexts are equals" << endl;
         else cout << "\tPlaintexts aren't equals" << endl;
@@ -178,17 +177,17 @@ int main(int argc, char *argv[])
 
         /* GOST 28147-89 ECB TESTING */
         cout << "GOST 28147-89 ECB TESTING" << endl;
-        string plaintextEcb(plaintext);
-        string cTextEcb = crypto->Encrypt_Gost28147_ECB(keyID, plaintextEcb);
-        cout << "\tChanged plaintext: " << plaintextEcb << endl;
+        byte_array plaintextEcb(plaintext);
+        byte_array cTextEcb = crypto->Encrypt_Gost28147_ECB(keyID, plaintextEcb);
+        cout << "\tChanged plaintext: " << string(plaintextEcb.begin(), plaintextEcb.end()) << endl;
         cout << "\tCiphertext size: " << cTextEcb.size() << endl;
-        cout << cTextEcb << endl;
+        cout << string(cTextEcb.begin(), cTextEcb.end()) << endl;
 
-        string dTextEcb = crypto->Decrypt_Gost28147_ECB(keyID, cTextEcb);
+        byte_array dTextEcb = crypto->Decrypt_Gost28147_ECB(keyID, cTextEcb);
         cout << "\tDeciphered size: " << dTextEcb.size() << endl;
-        cout << "\tDiciphered: " << dTextEcb << endl;
+        cout << "\tDiciphered: " << string(dTextEcb.begin(), dTextEcb.end()) << endl;
 
-        if(dTextEcb.substr(0, plaintext.size()) == plaintext) cout << "\tPlaintexts are equals" << endl;
+        if(byte_array(dTextEcb.begin(), dTextEcb.begin() + plaintext.size()) == plaintext) cout << "\tPlaintexts are equals" << endl;
         else cout << "\tPlaintexts aren't equals" << endl;
         cout << endl;
 
@@ -204,16 +203,18 @@ int main(int argc, char *argv[])
     try
     {
         cout << "GOST 28147-89 MAC TESTING" << endl;
-        string plaintext = "Plaintext for MAC";
-        string iv = "initvect";
-        cout << "Plaintext size: " << plaintext.size() << endl;
-        cout << "Plaintext: " << plaintext << endl;
-        cout << "\tIV size: " << iv.size() << endl;
-        cout << "\tIV: " << iv << endl;
+        string sPlaintext = "Plaintext for MAC";
+        string sIv = "initvect";
+        cout << "Plaintext size: " << sPlaintext.size() << endl;
+        cout << "Plaintext: " << sPlaintext << endl;
+        cout << "\tIV size: " << sIv.size() << endl;
+        cout << "\tIV: " << sIv << endl;
 
-        string signature = crypto->MAC_Gost28147_SIGN(keyID, plaintext, iv);
+        byte_array plaintext(sPlaintext.begin(), sPlaintext.end());
+        byte_array iv(sIv.begin(), sIv.end());
+        byte_array signature = crypto->MAC_Gost28147_SIGN(keyID, plaintext, iv);
         cout << "\tSignature size: " << signature.size() << endl;
-        cout << "\tSignature: " << signature << endl;
+        cout << "\tSignature: " << string(signature.begin(), signature.end()) << endl;
 
         if(crypto->MAC_Gost28147_VERIFY(keyID, plaintext, iv, signature))
             cout << "\tSignature is correct" << endl;
